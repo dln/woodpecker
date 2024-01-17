@@ -5,6 +5,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/andygrunwald/go-gerrit"
@@ -209,7 +210,22 @@ func (c *Gerrit) Deactivate(ctx context.Context, u *model.User, r *model.Repo, l
 // Branches returns the names of all branches for the named repository.
 func (c *Gerrit) Branches(ctx context.Context, u *model.User, r *model.Repo, p *model.ListOptions) ([]string, error) {
 	log.Debug().Msgf("Gerrit Branches")
-	return nil, nil
+	lb, _, err := c.client.Projects.ListBranches(ctx, string(r.ForgeRemoteID), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	n := p.Page*p.PerPage - p.PerPage
+	m := n + p.PerPage
+
+	branches := make([]string, 0)
+	for i, b := range *lb {
+		if i >= n && i < m && strings.HasPrefix(b.Ref, "refs/heads/") {
+			branches = append(branches, b.Ref[11:])
+		}
+	}
+
+	return branches, nil
 }
 
 // BranchHead returns the sha of the head (latest commit) of the specified branch
