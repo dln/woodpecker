@@ -8,6 +8,7 @@ require (
 	codeberg.org/6543/xyaml v1.1.0
 	github.com/6543/logfile-open v1.2.1
 	github.com/alessio/shellescape v1.4.2
+	github.com/andygrunwald/go-gerrit v0.0.0-20240113215056-6478d3098755
 	github.com/bmatcuk/doublestar/v4 v4.6.1
 	github.com/caddyserver/certmagic v0.20.0
 	github.com/cenkalti/backoff/v4 v4.2.1

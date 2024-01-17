@@ -38,6 +38,7 @@ import (
 	"go.woodpecker-ci.org/woodpecker/v2/server/cache"
 	"go.woodpecker-ci.org/woodpecker/v2/server/forge"
 	"go.woodpecker-ci.org/woodpecker/v2/server/forge/bitbucket"
+	"go.woodpecker-ci.org/woodpecker/v2/server/forge/gerrit"
 	"go.woodpecker-ci.org/woodpecker/v2/server/forge/gitea"
 	"go.woodpecker-ci.org/woodpecker/v2/server/forge/github"
 	"go.woodpecker-ci.org/woodpecker/v2/server/forge/gitlab"
@@ -176,6 +177,8 @@ func setupForge(c *cli.Context) (forge.Forge, error) {
 		return setupBitbucket(c)
 	case c.Bool("gitea"):
 		return setupGitea(c)
+	case c.Bool("gerrit"):
+		return setupGerrit(c)
 	default:
 		return nil, fmt.Errorf("version control system not configured")
 	}
@@ -189,6 +192,26 @@ func setupBitbucket(c *cli.Context) (forge.Forge, error) {
 	}
 	log.Trace().Msgf("Forge (bitbucket) opts: %#v", opts)
 	return bitbucket.New(opts)
+}
+
+// setupGerrit helper function to setup the Gerrit forge from the CLI arguments.
+func setupGerrit(c *cli.Context) (forge.Forge, error) {
+	server, err := url.Parse(c.String("gerrit-server"))
+	if err != nil {
+		return nil, err
+	}
+	opts := gerrit.Opts{
+		GerritURL:      c.String("gerrit-server"),
+		GerritUsername: c.String("gerrit-username"),
+		GerritPassword: c.String("gerrit-password"),
+		URL:            strings.TrimRight(server.String(), "/"),
+		SkipVerify:     c.Bool("gerrit-skip-verify"),
+	}
+	if len(opts.URL) == 0 {
+		log.Fatal().Msg("WOODPECKER_GERRIT_URL must be set")
+	}
+	log.Trace().Msgf("Forge (gerrit) opts: %#v", opts)
+	return gerrit.New(opts)
 }
 
 // setupGitea helper function to setup the Gitea forge from the CLI arguments.

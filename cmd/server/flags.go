@@ -314,6 +314,30 @@ var flags = append([]cli.Flag{
 		Usage:   "set the cpus allowed to execute containers",
 	},
 	//
+	// Gerrit
+	//
+	&cli.BoolFlag{
+		EnvVars: []string{"WOODPECKER_GERRIT"},
+		Name:    "gerrit",
+		Usage:   "gerrit driver is enabled",
+	},
+	&cli.StringFlag{
+		EnvVars: []string{"WOODPECKER_GERRIT_URL"},
+		Name:    "gerrit-server",
+		Usage:   "gerrit server address",
+	},
+	&cli.StringFlag{
+		EnvVars: []string{"WOODPECKER_GERRIT_USERNAME"},
+		Name:    "gerrit-username",
+		Usage:   "gerrit basic auth username",
+	},
+	&cli.StringFlag{
+		EnvVars: []string{"WOODPECKER_GERRIT_PASSWORD"},
+		Name:    "gerrit-password",
+		Usage:   "gerrit basic auth password",
+	},
+
+	//
 	// GitHub
 	//
 	&cli.BoolFlag{
