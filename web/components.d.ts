@@ -75,6 +75,7 @@ declare module 'vue' {
     IMdiTagOutline: typeof import('~icons/mdi/tag-outline')['default']
     InputField: typeof import('./src/components/form/InputField.vue')['default']
     IPhGitlabLogoSimpleFill: typeof import('~icons/ph/gitlab-logo-simple-fill')['default']
+    ISimpleIconsGerrit: typeof import('~icons/simple-icons/gerrit')['default']
     ISimpleIconsGitea: typeof import('~icons/simple-icons/gitea')['default']
     ITeenyiconsGitSolid: typeof import('~icons/teenyicons/git-solid')['default']
     ITeenyiconsRefreshOutline: typeof import('~icons/teenyicons/refresh-outline')['default']
