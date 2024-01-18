@@ -2,6 +2,7 @@ package gerrit
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"net/http"
 	"net/url"
@@ -82,8 +83,7 @@ func (c *Gerrit) URL() string {
 	return c.url
 }
 
-// Login authenticates an account with Gitea using basic authentication. The
-// Gitea account details are returned when the user is successfully authenticated.
+// Login is mocked
 func (c *Gerrit) Login(ctx context.Context, w http.ResponseWriter, req *http.Request) (*model.User, error) {
 	log.Debug().Msgf("Gerrit Login")
 	user := model.User{
@@ -98,7 +98,7 @@ func (c *Gerrit) Login(ctx context.Context, w http.ResponseWriter, req *http.Req
 	return &user, nil
 }
 
-// Auth
+// Auth is not implemented
 func (c *Gerrit) Auth(ctx context.Context, token, _ string) (string, error) {
 	log.Debug().Msgf("Gerrit Auth")
 	return "gerrit-user", nil
@@ -237,7 +237,33 @@ func (c *Gerrit) BranchHead(ctx context.Context, u *model.User, r *model.Repo, b
 // PullRequuests lists Changes for a repository in Gerrit.
 func (c *Gerrit) PullRequests(ctx context.Context, u *model.User, r *model.Repo, p *model.ListOptions) ([]*model.PullRequest, error) {
 	log.Debug().Msgf("Gerrit PullRequests")
-	return nil, nil
+
+	opt := &gerrit.QueryChangeOptions{
+		QueryOptions: gerrit.QueryOptions{
+			Query: []string{"status:open+project:" + r.Name},
+		},
+	}
+
+	changes, _, err := c.client.Changes.QueryChanges(ctx, opt)
+	if err != nil {
+		return nil, err
+	}
+
+	n := p.Page*p.PerPage - p.PerPage
+	m := n + p.PerPage
+
+	prs := make([]*model.PullRequest, 0)
+	for i, c := range *changes {
+		if i >= n && i < m {
+			pr := model.PullRequest{
+				Index: model.ForgeRemoteID(fmt.Sprint(c.Number)),
+				Title: c.Subject,
+			}
+			prs = append(prs, &pr)
+		}
+	}
+
+	return prs, nil
 }
 
 // Hook parses the incoming Gerrit webhook and returns the Repository and Pipeline
